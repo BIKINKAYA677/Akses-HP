@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Kontrol Perangkat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #1b1736;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px 15px;
+        }
+
+        /* Bar Status Hijau */
+        .status-top {
+            background: linear-gradient(90deg, #1d5c38, #2a7a4f);
+            border-radius: 12px;
+            padding: 12px 15px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 25px;
+        }
+
+        /* Susunan Tombol 3 Kolom */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* Gaya Tombol Dasar */
+        .btn {
+            background: #2e2853;
+            border: none;
+            border-radius: 18px;
+            padding: 22px 10px;
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+            opacity: 0.9;
+        }
+
+        /* Tombol Lock Screen Merah */
+        .btn.lock {
+            background: #942939;
+        }
+
+        /* Ikon Persis Seperti Gambar */
+        .icon {
+            font-size: 36px;
+            line-height: 1;
+        }
+
+        /* Tampilan HP */
+        @media (max-width: 420px) {
+            .control-grid { gap: 13px; }
+            .btn { padding: 18px 8px; font-size: 16px; }
+            .icon { font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="status-top">
+        ✅ Status: Aktif | Bisa dikontrol dari perangkat lain via IP di atas
+    </div>
+
+    <div class="control-grid">
+        <button class="btn" data-action="flashlight">
+            <span class="icon">🔦</span>
+            Senter<br>(Kamera)
+        </button>
+        <button class="btn" data-action="camera">
+            <span class="icon">📸</span>
+            Buka Kamera
+        </button>
+        <button class="btn" data-action="vibrate">
+            <span class="icon">📳</span>
+            Getar
+        </button>
+
+        <button class="btn" data-action="youtube">
+            <span class="icon">▶️</span>
+            YouTube
+        </button>
+        <button class="btn" data-action="tiktok">
+            <span class="icon">🎵</span>
+            TikTok
+        </button>
+        <button class="btn" data-action="playpause">
+            <span class="icon">⏯️</span>
+            Play/Pause
+        </button>
+
+        <button class="btn" data-action="prev">
+            <span class="icon">⏮️</span>
+            Prev Track
+        </button>
+        <button class="btn" data-action="next">
+            <span class="icon">⏭️</span>
+            Next Track
+        </button>
+        <button class="btn" data-action="volup">
+            <span class="icon">🔊</span>
+            Volume +
+        </button>
+
+        <button class="btn" data-action="voldown">
+            <span class="icon">🔉</span>
+            Volume -
+        </button>
+        <button class="btn" data-action="screenshot">
+            <span class="icon">📷</span>
+            Screenshot
+        </button>
+        <button class="btn lock" data-action="lock">
+            <span class="icon">🔒</span>
+            Lock Screen
+        </button>
+    </div>
+
+    <script>
+        // Fungsi tombol yang sudah berjalan
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const action = btn.dataset.action;
+                const teks = btn.textContent.trim().replace(/\s+/g, ' ');
+
+                switch(action) {
+                    case "camera":
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                            alert("✅ Kamera terbuka!");
+                            stream.getTracks().forEach(track => track.stop());
+                        } catch {
+                            alert("❌ Izinkan akses kamera di pengaturan browser ya");
+                        }
+                        break;
+
+                    case "flashlight":
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ 
+                                video: { facingMode: "back", torch: true } 
+                            });
+                            alert("✅ Senter nyala (khusus HP Android modern)");
+                            stream.getTracks().forEach(track => track.stop());
+                        } catch {
+                            alert("❌ Tidak bisa akses senter, coba buka di HP");
+                        }
+                        break;
+
+                    case "vibrate":
+                        if (navigator.vibrate) {
+                            navigator.vibrate(200);
+                            alert("✅ Perangkat bergetar sebentar");
+                        } else {
+                            alert("❌ Browser tidak mendukung fitur getar");
+                        }
+                        break;
+
+                    case "youtube":
+                        window.open("https://youtube.com", "_blank");
+                        break;
+
+                    case "tiktok":
+                        window.open("https://tiktok.com", "_blank");
+                        break;
+
+                    default:
+                        console.log("Perintah dikirim:", teks);
+                        alert(`Perintah: ${teks}\n⚠️ Fitur kontrol sistem butuh koneksi ke aplikasi pendamping / IP perangkat`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
